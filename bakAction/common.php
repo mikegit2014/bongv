@@ -12,7 +12,7 @@ function isAndroid(){
             return $t;    //如果是，则直接返回真值，不需要进行权限验证
         }else{
             //文件存在使用文件验证
-            $oper_auth = include_once CONF_PATH.'user_auth_conf.php';
+            $oper_auth = include_once './uploads/ShareData/user_auth_conf.php';
             if(!empty($oper_auth)){
                 $has_auth = $oper_auth[$gid][MODULE_NAME]['has'];
                 if(in_array($rule,$has_auth) && !empty($has_auth))
@@ -191,7 +191,49 @@ function isAndroid(){
         $keyword=urldecode($keyword);//将过滤后的关键字解码
         return $keyword;*/        
     }
+    //判断后缀名
+    function pack_img_suffix($img){
+        $pack = unpack('C2chars',$img);
+        $type_code = intval($pack['chars1'].$pack['chars2']);
+        switch ($type_code) {
+            case 7790:
+                $file_type = 'exe';
+                break;
+            case 7784:
+                $file_type = 'midi';
+                break;
+            case 8075:
+                $file_type = 'zip';
+                break;
+            case 8297:
+                $file_type = 'rar';
+                break;
+            case 255216:
+                $file_type = 'jpg';
+                break;
+            case 7173:
+                $file_type = 'gif';
+                break;
+            case 6677:
+                $file_type = 'bmp';
+                break;
+            case 13780:
+                $file_type = 'png';
+                break;
+            default:
+                $file_type = 'unknown';
+                break;
+        }
+        return $file_type;
+    }
 
+    //循环创建文件夹
+    function createDir_bv($path){
+        if (!file_exists($path)){
+            createDir_bv(dirname($path));
+            mkdir($path, 0777);
+        }
+    }
     //判断是否是否纯汉字
     function utf8_str($str){  
         $mb = mb_strlen($str,'utf-8');  
